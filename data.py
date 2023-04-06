@@ -3,15 +3,15 @@ import numpy as np
 
 import torch
 from torch.nn.utils.rnn import pad_sequence
-
+from sklearn.model_selection import train_test_split
 
 def load_data(x_path):
-    # Your code here
+
     return x
 
 
 def split_data(x, y, split=0.8):
-    # Your code here
+    train_x, train_y, test_x, test_y = train_test_split(x, y, train_size=split)
     return train_x, train_y, test_x, test_y
 
 
