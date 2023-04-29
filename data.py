@@ -73,7 +73,8 @@ def preprocess_x(df):
     condensed_df3 = df.pivot_table(
         index=['patientunitstayid', 'unitvisitnumber', 'offset', 'admissionheight', 'admissionweight', 'age', 'ethnicity', 'gender', 'hospitaldischargestatus'],
         columns=['celllabel'],
-        values=['cellattributevalue']
+        values=['cellattributevalue'], 
+        aggfunc='min'
     ).reset_index()
     
     condensed_df4 = pd.merge(condensed_df1, condensed_df2, on=['patientunitstayid', 'unitvisitnumber', 'offset', 'admissionheight', 'admissionweight', 'age', 'ethnicity', 'gender', 'hospitaldischargestatus'], how='outer')
@@ -82,6 +83,18 @@ def preprocess_x(df):
     condensed_df = condensed_df.sort_values(by=['patientunitstayid', 'offset'])
     
     condensed_df.columns = ['patientunitstayid', 'unitvisitnumber', 'offset', 'admissionheight', 'admissionweight', 'age', 'ethnicity', 'gender', 'hospitaldischargestatus', 'Capillary Refill', 'GCS Total', 'Heart Rate', 'Invasive BP Diastolic', 'Invasive BP Mean', 'Invasive BP Systolic', 'Non-Invasive BP Diastolic', 'Non-Invasive BP Mean', 'Non-Invasive BP Systolic', 'O2 Saturation', 'Respiratory Rate', 'glucose', 'pH']
+    
+    # condensed_df['Capillary Refill'] = condensed_df['Capillary Refill'].ffill()
+    # condensed_df['Capillary Refill'] = condensed_df['Capillary Refill'].fillna(0, inplace=True)
+    
+    condensed_df['Capillary Refill'] = condensed_df.groupby('patientunitstayid')['Capillary Refill'].ffill().fillna(0)
+    condensed_df['glucose'] = condensed_df.groupby('patientunitstayid')['glucose'].ffill()
+    condensed_df['glucose'] = condensed_df.groupby('patientunitstayid')['glucose'].ffill()
+    condensed_df['glucose'] = condensed_df['glucose'].fillna(86.6)
+    condensed_df['pH'] = condensed_df.groupby('patientunitstayid')['pH'].ffill()
+    condensed_df['pH'] = condensed_df.groupby('patientunitstayid')['pH'].bfill()
+    condensed_df['pH'] = condensed_df['pH'].fillna(7.4)
+    
+    condensed_df['GCS Total'] = condensed_df.groupby('patientunitstayid')['GCS Total'].ffill().fillna(15)
     condensed_df.to_csv('processed_train_x.csv', index=False)
-    print(condensed_df.columns)
     return condensed_df
