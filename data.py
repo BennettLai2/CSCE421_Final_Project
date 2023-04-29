@@ -44,10 +44,10 @@ def preprocess_x(df):
     df.drop(index=df.loc[mask].index, inplace=True)
     # one-hot encode for celllabel
     df['cellattributevalue'] = df['cellattributevalue'].replace({'normal': 0, 
-                     '< 2 seconds': 1, 
-                     '> 2 seconds': 2, 
-                     'feet': 3, 
-                     'hands': 4})
+                                                                '< 2 seconds': 1, 
+                                                                '> 2 seconds': 2, 
+                                                                'feet': 3, 
+                                                                'hands': 4})
     # replace missing GCS for filling
     df = df.replace('Unable to score due to medication', pd.NaT)
     cols = ['admissionheight', 'admissionweight', 'age', 'ethnicity', 'gender', 'unitvisitnumber', 'nursingchartvalue']
@@ -80,5 +80,8 @@ def preprocess_x(df):
     condensed_df = pd.merge(condensed_df3, condensed_df4, on=['patientunitstayid', 'unitvisitnumber', 'offset', 'admissionheight', 'admissionweight', 'age', 'ethnicity', 'gender', 'hospitaldischargestatus'], how='outer')
     
     condensed_df = condensed_df.sort_values(by=['patientunitstayid', 'offset'])
-    condensed_df.to_csv('pocessed_train_x.csv', index=False)
-    return df
+    
+    condensed_df.columns = ['patientunitstayid', 'unitvisitnumber', 'offset', 'admissionheight', 'admissionweight', 'age', 'ethnicity', 'gender', 'hospitaldischargestatus', 'Capillary Refill', 'GCS Total', 'Heart Rate', 'Invasive BP Diastolic', 'Invasive BP Mean', 'Invasive BP Systolic', 'Non-Invasive BP Diastolic', 'Non-Invasive BP Mean', 'Non-Invasive BP Systolic', 'O2 Saturation', 'Respiratory Rate', 'glucose', 'pH']
+    condensed_df.to_csv('processed_train_x.csv', index=False)
+    print(condensed_df.columns)
+    return condensed_df
