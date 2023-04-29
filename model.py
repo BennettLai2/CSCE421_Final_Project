@@ -5,16 +5,18 @@ class Model():
         # You can add arguements to the initialization as needed
 
         ########################################################################
+        return ''
 
     def fit(self, x_train, y_train, x_val=None, y_val=None):
         ############################ Your Code Here ############################
         # Fit your model to the training data here
 
         ########################################################################
+        return ''
 
     def predict_proba(self, x):
         ############################ Your Code Here ############################
         # Predict the probability of in-hospital mortaility for each x
 
         ########################################################################
-        return preds
+        return 'preds'
