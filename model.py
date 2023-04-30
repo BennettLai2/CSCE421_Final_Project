@@ -1,4 +1,7 @@
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.decomposition import PCA
+
+from sklearn.svm import SVC
 
 class Model():
     def __init__(self, n_neighbors: int):
@@ -14,6 +17,10 @@ class Model():
         # Fit your model to the training data here
 
         ########################################################################
+        self.pca = PCA(n_components=5)
+        self.pca.fit(x_train)
+        x_train = self.pca.transform(x_train)
+        x_val = self.pca.transform(x_val)
         self.neigh.fit(x_train, y_train)
         return self.neigh.score(x_val, y_val)
 
@@ -22,5 +29,6 @@ class Model():
         # Predict the probability of in-hospital mortaility for each x
 
         ########################################################################
+        x = self.pca.transform(x)
         probas = self.neigh.predict_proba(x)
         return probas

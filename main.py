@@ -3,6 +3,7 @@
 # data = create_data_for_project(".")
 
 import itertools
+import numpy as np
  
 import torch
 import pandas as pd
@@ -47,8 +48,8 @@ def main():
     # y = load_data("train_y.csv")
     # merged_df = pd.merge(x, y[['patientunitstayid', 'hospitaldischargestatus']], on='patientunitstayid')
     # merged_df = preprocess_x(merged_df)
-    y = merged_df[['hospitaldischargestatus']]
-    y.to_csv('y.csv')
+    y = merged_df[['hospitaldischargestatus']].values.ravel()
+    np.savetxt('y.csv', y, delimiter=',')
     x = merged_df.drop('hospitaldischargestatus', axis=1)
 
     train_x, test_x, train_y, test_y = split_data(x, y)
@@ -63,12 +64,13 @@ def main():
 
     # ############################
 
-    model = Model(10)  # you can add arguments as needed
+    model = Model(1)  # you can add arguments as needed
     acc = model.fit(train_x, train_y, test_x, test_y)
     print(acc)
-    probas = model.predict_proba(test_x)
-    print(probas)
+    probas = pd.DataFrame(model.predict_proba(test_x), columns=['proba_0', 'proba_1'])
 
+    # Write to CSV
+    probas.to_csv('probas.csv', index=False)
     # x = load_data("test_x.csv")
 
     # ###### Your Code Here #######
