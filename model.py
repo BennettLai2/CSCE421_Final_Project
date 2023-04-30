@@ -17,7 +17,7 @@ class Model():
         # Fit your model to the training data here
 
         ########################################################################
-        self.pca = PCA(n_components=5)
+        self.pca = PCA(n_components=7)
         self.pca.fit(x_train)
         x_train = self.pca.transform(x_train)
         x_val = self.pca.transform(x_val)

@@ -64,13 +64,21 @@ def main():
 
     # ############################
 
-    model = Model(1)  # you can add arguments as needed
-    acc = model.fit(train_x, train_y, test_x, test_y)
+    model = Model(100)  # you can add arguments as needed
+    acc = model.fit(train_x.drop('patientunitstayid', axis=1), train_y, test_x.drop('patientunitstayid', axis=1), test_y)
     print(acc)
-    probas = pd.DataFrame(model.predict_proba(test_x), columns=['proba_0', 'proba_1'])
 
-    # Write to CSV
-    probas.to_csv('probas.csv', index=False)
+    probas = pd.DataFrame(model.predict_proba(test_x.drop('patientunitstayid', axis=1)), columns=['proba_0', 'proba_1'])
+    probas = probas[['proba_0']].values.ravel()
+    np.savetxt('probas.csv', probas, delimiter=',')
+    # print(test_x)
+    patientunitstayid = test_x[['patientunitstayid']].values.ravel()
+    unique_ids = np.unique(patientunitstayid)
+    mean_proba = [np.mean(probas[np.where(patientunitstayid==id)]) for id in unique_ids]
+
+    # # create 2D array with patientunitstayid and mean proba values
+    result = np.column_stack((unique_ids, mean_proba))
+    np.savetxt('result.csv', result, delimiter=',')
     # x = load_data("test_x.csv")
 
     # ###### Your Code Here #######
