@@ -38,30 +38,37 @@ class DeviceDataLoader():
         return len(self.dl)
 
 def main():
-    args = parse()
-    device = get_default_device()
-    print(device)
+    # args = parse()
+    # device = get_default_device()
+    # print(device)
 
-    x = load_data("train_x.csv")
-    y = load_data("train_y.csv")
-    merged_df = pd.merge(x, y[['patientunitstayid', 'hospitaldischargestatus']], on='patientunitstayid')
-    processed_x_train = preprocess_x(merged_df)
-    # processed_x_test = preprocess_x(y)
+    merged_df = load_data("processed_train_x.csv")
+    # x = load_data("train_x.csv")
+    # y = load_data("train_y.csv")
+    # merged_df = pd.merge(x, y[['patientunitstayid', 'hospitaldischargestatus']], on='patientunitstayid')
+    # merged_df = preprocess_x(merged_df)
+    y = merged_df[['hospitaldischargestatus']]
+    y.to_csv('y.csv')
+    x = merged_df.drop('hospitaldischargestatus', axis=1)
 
-    # train_x, train_y, test_x, test_y = split_data(x, y)
-
-    # ###### Your Code Here #######
-    # # Add anything you want here
-
-    # ############################
+    train_x, test_x, train_y, test_y = split_data(x, y)
 
     # ###### Your Code Here #######
     # # Add anything you want here
 
     # ############################
 
-    # model = Model(args)  # you can add arguments as needed
-    # model.fit(processed_x_train, train_y)
+    # ###### Your Code Here #######
+    # # Add anything you want here
+
+    # ############################
+
+    model = Model(10)  # you can add arguments as needed
+    acc = model.fit(train_x, train_y, test_x, test_y)
+    print(acc)
+    probas = model.predict_proba(test_x)
+    print(probas)
+
     # x = load_data("test_x.csv")
 
     # ###### Your Code Here #######

@@ -28,8 +28,8 @@ def load_data(x_path):
 
 def split_data(x, y, split=0.8):
     # Your code here
-    train_x, train_y, test_x, test_y = train_test_split(x, y, test_size = 1-split)
-    return train_x, train_y, test_x, test_y
+    train_x, test_x, train_y, test_y = train_test_split(x, y, test_size = 1-split, shuffle=False)
+    return train_x, test_x, train_y, test_y
 
 
 def preprocess_x(df):
@@ -88,19 +88,15 @@ def preprocess_x(df):
     # condensed_df['Capillary Refill'] = condensed_df['Capillary Refill'].fillna(0, inplace=True)
     
     condensed_df['Capillary Refill'] = condensed_df.groupby('patientunitstayid')['Capillary Refill'].ffill().fillna(0)
-    condensed_df['Heart Rate'] = condensed_df.groupby('patientunitstayid')['Heart Rate'].ffill()
-    condensed_df['Heart Rate'] = condensed_df.groupby('patientunitstayid')['Heart Rate'].ffill()
-    condensed_df['O2 Saturation'] = condensed_df.groupby('patientunitstayid')['O2 Saturation'].ffill()
-    condensed_df['O2 Saturation'] = condensed_df.groupby('patientunitstayid')['O2 Saturation'].bfill()
+    condensed_df['Heart Rate'] = condensed_df.groupby('patientunitstayid')['Heart Rate'].ffill().bfill()
+    condensed_df['Heart Rate'] = condensed_df['Heart Rate'].fillna(condensed_df['Heart Rate'])
+    condensed_df['O2 Saturation'] = condensed_df.groupby('patientunitstayid')['O2 Saturation'].ffill().bfill()
     condensed_df['O2 Saturation'] = condensed_df['O2 Saturation'].fillna(100)
-    condensed_df['Respiratory Rate'] = condensed_df.groupby('patientunitstayid')['Respiratory Rate'].ffill()
-    condensed_df['Respiratory Rate'] = condensed_df.groupby('patientunitstayid')['Respiratory Rate'].bfill()
+    condensed_df['Respiratory Rate'] = condensed_df.groupby('patientunitstayid')['Respiratory Rate'].ffill().bfill()
     condensed_df['Respiratory Rate'] = condensed_df['Respiratory Rate'].fillna(18)
-    condensed_df['glucose'] = condensed_df.groupby('patientunitstayid')['glucose'].ffill()
-    condensed_df['glucose'] = condensed_df.groupby('patientunitstayid')['glucose'].bfill()
+    condensed_df['glucose'] = condensed_df.groupby('patientunitstayid')['glucose'].ffill().bfill()
     condensed_df['glucose'] = condensed_df['glucose'].fillna(86.6)
-    condensed_df['pH'] = condensed_df.groupby('patientunitstayid')['pH'].ffill()
-    condensed_df['pH'] = condensed_df.groupby('patientunitstayid')['pH'].bfill()
+    condensed_df['pH'] = condensed_df.groupby('patientunitstayid')['pH'].ffill().bfill()
     condensed_df['pH'] = condensed_df['pH'].fillna(7.4)
     
     condensed_df['GCS Total'] = condensed_df.groupby('patientunitstayid')['GCS Total'].ffill().fillna(15)
@@ -114,14 +110,16 @@ def preprocess_x(df):
     condensed_df.drop(['Invasive BP Diastolic', 'Invasive BP Mean', 'Invasive BP Systolic', 'Non-Invasive BP Diastolic',
                        'Non-Invasive BP Mean', 'Non-Invasive BP Systolic'], axis=1, inplace=True)
     condensed_df = pd.concat([condensed_df, combined_df], axis=1)
-    condensed_df['BP Diastolic'] = condensed_df.groupby('patientunitstayid')['BP Diastolic'].ffill()
-    condensed_df['BP Diastolic'] = condensed_df.groupby('patientunitstayid')['BP Diastolic'].bfill()
-    condensed_df['BP Systolic'] = condensed_df.groupby('patientunitstayid')['BP Systolic'].ffill()
-    condensed_df['BP Systolic'] = condensed_df.groupby('patientunitstayid')['BP Systolic'].bfill()
-    condensed_df['BP Mean'] = condensed_df['BP Mean'].fillna(condensed_df['BP Diastolic'].shift(1) + (condensed_df['BP Diastolic'].shift(1)-condensed_df['BP Systolic'].shift(-1))/3)
-
-
-
+    condensed_df['BP Diastolic'] = condensed_df.groupby('patientunitstayid')['BP Diastolic'].ffill().bfill()
+    condensed_df['BP Diastolic'] = condensed_df['BP Diastolic'].fillna(condensed_df['BP Diastolic'])    
+    condensed_df['BP Systolic'] = condensed_df.groupby('patientunitstayid')['BP Systolic'].ffill().bfill()
+    condensed_df['BP Systolic'] = condensed_df['BP Systolic'].fillna(condensed_df['BP Systolic'])   
+    condensed_df['BP Mean'] = condensed_df['BP Mean'].fillna(condensed_df['BP Diastolic'].shift(1) + (condensed_df['BP Systolic'].shift(-1) - condensed_df['BP Diastolic'].shift(1))/3)
+    condensed_df=condensed_df.ffill()
+    categorical = condensed_df.select_dtypes(exclude=['int64', 'float64'])
+    numerical = condensed_df.select_dtypes(include=['int64', 'float64'])
+    cate_dummies = pd.get_dummies(categorical)
+    condensed_df = pd.concat([cate_dummies, numerical], axis=1)
     condensed_df.to_csv('processed_train_x.csv', index=False)
 
     return condensed_df
