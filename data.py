@@ -122,6 +122,11 @@ def preprocess_x(df):
 
 
 
+    condensed_df = pd.get_dummies(condensed_df, columns=['ethnicity', 'gender'], dtype=int)
+    condensed_df['Heart Rate'] = pd.to_numeric(condensed_df['Heart Rate'], errors='coerce', downcast='float')
+    condensed_df['BP Diastolic'] = pd.to_numeric(condensed_df['BP Diastolic'], errors='coerce', downcast='float')
+    condensed_df['BP Systolic'] = pd.to_numeric(condensed_df['BP Systolic'], errors='coerce', downcast='float')
+    condensed_df = condensed_df.dropna()  # very temporary
     condensed_df.to_csv('processed_train_x.csv', index=False)
 
     return condensed_df

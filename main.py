@@ -5,13 +5,16 @@
 import itertools
  
 import torch
+import torch.nn as nn
+import torch.optim as optim
 import pandas as pd
 from sklearn.metrics import roc_auc_score
 
 
 from data import load_data, preprocess_x, split_data
 from parser_1 import parse
-from model import Model
+from model import Model, MortalityDataset, train_model
+from torch.utils.data import DataLoader, Dataset
 
 
 def get_default_device():
@@ -46,37 +49,27 @@ def main():
     y = load_data("train_y.csv")
     merged_df = pd.merge(x, y[['patientunitstayid', 'hospitaldischargestatus']], on='patientunitstayid')
     processed_x_train = preprocess_x(merged_df)
+    # print(processed_x_train.dtypes)
     # processed_x_test = preprocess_x(y)
 
     # train_x, train_y, test_x, test_y = split_data(x, y)
 
-    # ###### Your Code Here #######
-    # # Add anything you want here
+    train_dataset = MortalityDataset(processed_x_train, y)
+    train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True, num_workers=2)
 
-    # ############################
+    input_size = processed_x_train.shape[1]
+    hidden_size = 64
+    num_layers = 3
+    output_size = 1
+    model = Model(input_size, hidden_size, num_layers, output_size).to(device)
 
-    # ###### Your Code Here #######
-    # # Add anything you want here
+    criterion = nn.BCEWithLogitsLoss()
+    optimizer = optim.Adam(model.parameters(), lr=0.0001)
 
-    # ############################
-
-    # model = Model(args)  # you can add arguments as needed
-    # model.fit(processed_x_train, train_y)
-    # x = load_data("test_x.csv")
-
-    # ###### Your Code Here #######
-    # # Add anything you want here
-
-    # ############################
-
-    # processed_x_test = preprocess_x(x)
-
-    # prediction_probs = model.predict_proba(processed_x_test)
-
-    #### Your Code Here ####
-    # Save your results
-
-    ########################
+    num_epochs = 10
+    for epoch in range(num_epochs):
+        train_loss = train_model(model, train_loader, criterion, optimizer, device)
+        print(f"Epoch {epoch + 1}, Loss: {train_loss:.4f}")
 
 
 if __name__ == "__main__":
