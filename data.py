@@ -28,7 +28,7 @@ def load_data(x_path):
 
 def split_data(x, y, split=0.8):
     # Your code here
-    train_x, train_y, test_x, test_y = train_test_split(x, y, test_size = 1-split)
+    train_x, train_y, test_x, test_y = train_test_split(x, y, test_size = 1-split, shuffle=False)
     return train_x, train_y, test_x, test_y
 
 
@@ -120,8 +120,10 @@ def preprocess_x(df):
     condensed_df['BP Systolic'] = condensed_df.groupby('patientunitstayid')['BP Systolic'].bfill()
     condensed_df['BP Mean'] = condensed_df['BP Mean'].fillna(condensed_df['BP Diastolic'].shift(1) + (condensed_df['BP Diastolic'].shift(1)-condensed_df['BP Systolic'].shift(-1))/3)
 
-
-
+    categorical = condensed_df.select_dtypes(exclude=['int64', 'float64'])
+    numerical = condensed_df.select_dtypes(include=['int64', 'float64'])
+    cate_dummies = pd.get_dummies(categorical)
+    condensed_df = pd.concat([cate_dummies, numerical], axis=1)
     condensed_df.to_csv('processed_train_x.csv', index=False)
 
     return condensed_df
