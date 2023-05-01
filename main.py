@@ -85,15 +85,15 @@ def main():
     # test_x = preprocess_x(test_x)
     # test_x.to_csv('processed_test_x.csv', index=False)
 
-    # test_x = load_data('processed_test_x.csv')
-    # test_x['ethnicity_Native American'] = 0
-    # test_x = test_x.reindex(columns =['patientunitstayid', 'ethnicity_African American', 'ethnicity_Asian', 'ethnicity_Caucasian', 'ethnicity_Hispanic', 'ethnicity_Native American', 'ethnicity_Other/Unknown', 'gender_Female', 'gender_Male', 'unitvisitnumber', 'offset', 'admissionheight', 'admissionweight', 'age', 'Capillary Refill', 'GCS Total', 'Heart Rate', 'O2 Saturation', 'Respiratory Rate', 'glucose', 'pH', 'BP Diastolic', 'BP Mean', 'BP Systolic'])
-    # probas = pd.DataFrame(model.predict_proba(test_x.drop('patientunitstayid', axis=1)), columns=['proba_0', 'proba_1'])
-    # probas = probas[['proba_1']].values.ravel()
-    # np.savetxt('probas.csv', probas, delimiter=',')
-    # patientunitstayid = test_x[['patientunitstayid']].values.ravel()
-    # unique_ids = np.unique(patientunitstayid)
-    # mean_proba = [np.mean(probas[np.where(patientunitstayid==id)]) for id in unique_ids]
+    test_x = load_data('processed_test_x.csv')
+    test_x['ethnicity_Native American'] = 0
+    test_x = test_x.reindex(columns =['patientunitstayid', 'ethnicity_African American', 'ethnicity_Asian', 'ethnicity_Caucasian', 'ethnicity_Hispanic', 'ethnicity_Native American', 'ethnicity_Other/Unknown', 'gender_Female', 'gender_Male', 'unitvisitnumber', 'offset', 'admissionheight', 'admissionweight', 'age', 'Capillary Refill', 'GCS Total', 'Heart Rate', 'O2 Saturation', 'Respiratory Rate', 'glucose', 'pH', 'BP Diastolic', 'BP Mean', 'BP Systolic'])
+    probas = pd.DataFrame(model.predict_proba(test_x.drop('patientunitstayid', axis=1)), columns=['proba_0', 'proba_1'])
+    probas = probas[['proba_1']].values.ravel()
+    np.savetxt('probas.csv', probas, delimiter=',')
+    patientunitstayid = test_x[['patientunitstayid']].values.ravel()
+    unique_ids = np.unique(patientunitstayid)
+    mean_proba = [np.mean(probas[np.where(patientunitstayid==id)]) for id in unique_ids]
     
     # # # create 2D array with patientunitstayid and mean proba values
     # np.set_printoptions(precision=6)
