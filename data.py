@@ -61,30 +61,30 @@ def preprocess_x(df):
     # df.to_csv('pre.csv')
     
     condensed_df1 = df.pivot_table(
-        index=['patientunitstayid', 'unitvisitnumber', 'offset', 'admissionheight', 'admissionweight', 'age', 'ethnicity', 'gender', 'hospitaldischargestatus'],
+        index=['patientunitstayid', 'unitvisitnumber', 'offset', 'admissionheight', 'admissionweight', 'age', 'ethnicity', 'gender'],
         columns=['nursingchartcelltypevalname'],
         values=['nursingchartvalue']
     ).reset_index()
     
     condensed_df2 = df.pivot_table(
-        index=['patientunitstayid', 'unitvisitnumber', 'offset', 'admissionheight', 'admissionweight', 'age', 'ethnicity', 'gender', 'hospitaldischargestatus'],
+        index=['patientunitstayid', 'unitvisitnumber', 'offset', 'admissionheight', 'admissionweight', 'age', 'ethnicity', 'gender'],
         columns=['labname'],
         values=['labresult']
     ).reset_index()
 
     condensed_df3 = df.pivot_table(
-        index=['patientunitstayid', 'unitvisitnumber', 'offset', 'admissionheight', 'admissionweight', 'age', 'ethnicity', 'gender', 'hospitaldischargestatus'],
+        index=['patientunitstayid', 'unitvisitnumber', 'offset', 'admissionheight', 'admissionweight', 'age', 'ethnicity', 'gender'],
         columns=['celllabel'],
         values=['cellattributevalue'], 
         aggfunc='min'
     ).reset_index()
     
-    condensed_df4 = pd.merge(condensed_df1, condensed_df2, on=['patientunitstayid', 'unitvisitnumber', 'offset', 'admissionheight', 'admissionweight', 'age', 'ethnicity', 'gender', 'hospitaldischargestatus'], how='outer')
-    condensed_df = pd.merge(condensed_df3, condensed_df4, on=['patientunitstayid', 'unitvisitnumber', 'offset', 'admissionheight', 'admissionweight', 'age', 'ethnicity', 'gender', 'hospitaldischargestatus'], how='outer')
+    condensed_df4 = pd.merge(condensed_df1, condensed_df2, on=['patientunitstayid', 'unitvisitnumber', 'offset', 'admissionheight', 'admissionweight', 'age', 'ethnicity', 'gender'], how='outer')
+    condensed_df = pd.merge(condensed_df3, condensed_df4, on=['patientunitstayid', 'unitvisitnumber', 'offset', 'admissionheight', 'admissionweight', 'age', 'ethnicity', 'gender'], how='outer')
     
     condensed_df = condensed_df.sort_values(by=['patientunitstayid', 'offset'])
     
-    condensed_df.columns = ['patientunitstayid', 'unitvisitnumber', 'offset', 'admissionheight', 'admissionweight', 'age', 'ethnicity', 'gender', 'hospitaldischargestatus', 'Capillary Refill', 'GCS Total', 'Heart Rate', 'Invasive BP Diastolic', 'Invasive BP Mean', 'Invasive BP Systolic', 'Non-Invasive BP Diastolic', 'Non-Invasive BP Mean', 'Non-Invasive BP Systolic', 'O2 Saturation', 'Respiratory Rate', 'glucose', 'pH']
+    condensed_df.columns = ['patientunitstayid', 'unitvisitnumber', 'offset', 'admissionheight', 'admissionweight', 'age', 'ethnicity', 'gender', 'Capillary Refill', 'GCS Total', 'Heart Rate', 'Invasive BP Diastolic', 'Invasive BP Mean', 'Invasive BP Systolic', 'Non-Invasive BP Diastolic', 'Non-Invasive BP Mean', 'Non-Invasive BP Systolic', 'O2 Saturation', 'Respiratory Rate', 'glucose', 'pH']
     
     # condensed_df['Capillary Refill'] = condensed_df['Capillary Refill'].ffill()
     # condensed_df['Capillary Refill'] = condensed_df['Capillary Refill'].fillna(0, inplace=True)
@@ -125,9 +125,13 @@ def preprocess_x(df):
     condensed_df = pd.concat([cate_dummies, numerical], axis=1)
 
     
+    x = condensed_df.apply(pd.to_numeric, errors='coerce')
+    df_mean = x.mean()
+    df_max = x.groupby('patientunitstayid', as_index=False).max()
+    df_min = x.groupby('patientunitstayid', as_index=False).min()
+    cols = ['Capillary Refill','GCS Total','Heart Rate','O2 Saturation','Respiratory Rate','glucose','pH','BP Diastolic','BP Mean','BP Systolic']
+    df_max[cols] = df_max[cols].subtract(df_mean[cols].values).abs()
+    df_min[cols] = df_min[cols].subtract(df_mean[cols].values).abs()
+    x = pd.DataFrame(np.maximum(df_max.values, df_min.values), columns=df_max.columns)
 
-    # for feature in condensed_df.columns:
-    #     condensed_df[feature] = abs(condensed_df[feature] - condensed_df[feature].mean())
-    # condensed_df.to_csv('processed_train_x.csv', index=False)
-
-    return condensed_df
+    return x
