@@ -79,7 +79,7 @@ def main():
     #     print(acc)
     model = Model(50)  # you can add arguments as needed
     acc = model.fit(train_x.drop('patientunitstayid', axis=1), train_y, test_x.drop('patientunitstayid', axis=1), test_y)
-        
+    print(acc)
 
     probas = pd.DataFrame(model.predict_proba(test_x.drop('patientunitstayid', axis=1)), columns=['proba_0', 'proba_1'])
     probas = probas[['proba_1']].values.ravel()
@@ -87,7 +87,7 @@ def main():
     # print(test_x)
     patientunitstayid = test_x[['patientunitstayid']].values.ravel()
     unique_ids = np.unique(patientunitstayid)
-    mean_proba = [np.max(probas[np.where(patientunitstayid==id)]) for id in unique_ids]
+    mean_proba = [np.mean(probas[np.where(patientunitstayid==id)]) for id in unique_ids]
 
     # # create 2D array with patientunitstayid and mean proba values
     result = np.column_stack((unique_ids, mean_proba))
