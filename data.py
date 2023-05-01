@@ -124,10 +124,4 @@ def preprocess_x(df):
     cate_dummies = pd.get_dummies(categorical)
     condensed_df = pd.concat([cate_dummies, numerical], axis=1)
 
-    
-
-    # for feature in condensed_df.columns:
-    #     condensed_df[feature] = abs(condensed_df[feature] - condensed_df[feature].mean())
-    # condensed_df.to_csv('processed_train_x.csv', index=False)
-
     return condensed_df

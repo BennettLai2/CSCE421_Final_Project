@@ -11,15 +11,15 @@ class Model():
 
         ########################################################################
         self.neigh = KNeighborsClassifier(n_neighbors=n_neighbors)
-        self.cols = ['age', 'offset','admissionheight','admissionweight', 'gender_Female', 'Heart Rate', 'BP Diastolic','BP Mean','BP Systolic']
+        self.cols = ['age', 'admissionweight', 'GCS Total', 'Heart Rate', 'O2 Saturation', 'Respiratory Rate', 'BP Mean']
 
     def fit(self, x_train, y_train, x_val=None, y_val=None):
         ############################ Your Code Here ############################
         # Fit your model to the training data here
 
         ########################################################################
-        # x_train = x_train[self.cols]
-        # x_val = x_val[self.cols]
+        x_train = x_train[self.cols]
+        x_val = x_val[self.cols]
         self.pca = PCA(n_components=2)
         self.pca.fit(x_train)
         x_train = self.pca.transform(x_train)
@@ -32,7 +32,7 @@ class Model():
         # Predict the probability of in-hospital mortaility for each x
 
         ########################################################################
-        # x =x[self.cols]
+        x =x[self.cols]
         x = self.pca.transform(x)
         probas = self.neigh.predict_proba(x)
         return probas
