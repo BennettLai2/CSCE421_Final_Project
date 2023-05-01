@@ -11,7 +11,7 @@ class Model():
 
         ########################################################################
         self.neigh = KNeighborsClassifier(n_neighbors=n_neighbors)
-        self.cols = ['age', 'admissionweight', 'GCS Total', 'Heart Rate', 'O2 Saturation', 'Respiratory Rate', 'BP Mean']
+        self.cols = ['age', 'unitvisitnumber', 'offset', 'GCS Total', 'Heart Rate', 'O2 Saturation', 'Respiratory Rate', 'BP Mean']
 
     def fit(self, x_train, y_train, x_val=None, y_val=None):
         ############################ Your Code Here ############################

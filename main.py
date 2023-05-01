@@ -74,11 +74,11 @@ def main():
         Y_train = y[train_index]
         Y_test = y[test_index]
         
-        model = Model(50)  # you can add arguments as needed
-        acc = model.fit(X_train.drop('patientunitstayid', axis=1), Y_train, X_test.drop('patientunitstayid', axis=1), Y_test)
+        cv_model = Model(50)  # you can add arguments as needed
+        acc = cv_model.fit(X_train.drop('patientunitstayid', axis=1), Y_train, X_test.drop('patientunitstayid', axis=1), Y_test)
         print(acc)
     model = Model(50)  # you can add arguments as needed
-    acc = model.fit(train_x.drop('patientunitstayid', axis=1), train_y, test_x.drop('patientunitstayid', axis=1), test_y[test_index])
+    acc = model.fit(train_x.drop('patientunitstayid', axis=1), train_y, test_x.drop('patientunitstayid', axis=1), test_y)
         
 
     # probas = pd.DataFrame(model.predict_proba(test_x.drop('patientunitstayid', axis=1)), columns=['proba_0', 'proba_1'])
