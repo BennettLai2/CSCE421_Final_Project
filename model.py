@@ -11,8 +11,8 @@ class Model():
         # You can add arguements to the initialization as needed
 
         ########################################################################
-        self.neigh = RandomForestClassifier(n_estimators=500, max_depth=10, random_state=0)
-        self.cols = ['age', 'unitvisitnumber', 'admissionweight', 'GCS Total', 'Heart Rate', 'O2 Saturation', 'Respiratory Rate', 'BP Mean']
+        self.neigh = RandomForestClassifier(n_estimators=500, max_depth=20, random_state=0)
+        self.cols = ['age', 'GCS Total', 'offset', 'Capillary Refill', 'BP Systolic', 'gender_Male']
 
     def fit(self, x_train, y_train, x_val=None, y_val=None):
         ############################ Your Code Here ############################
@@ -21,10 +21,10 @@ class Model():
         ########################################################################
         x_train = x_train[self.cols]
         x_val = x_val[self.cols]
-        # self.pca = PCA(n_components=3)
-        # self.pca.fit(x_train)
-        # x_train = self.pca.transform(x_train)
-        # x_val = self.pca.transform(x_val)
+        self.pca = PCA(n_components=3)
+        self.pca.fit(x_train)
+        x_train = self.pca.transform(x_train)
+        x_val = self.pca.transform(x_val)
         self.neigh.fit(x_train, y_train)
         threshold = 0.3
         predicted_proba = self.neigh.predict_proba(x_val)
@@ -39,6 +39,6 @@ class Model():
 
         ########################################################################
         x =x[self.cols]
-        # x = self.pca.transform(x)
+        x = self.pca.transform(x)
         probas = self.neigh.predict_proba(x)
         return probas
