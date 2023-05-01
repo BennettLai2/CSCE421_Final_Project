@@ -11,7 +11,7 @@ class Model():
 
         ########################################################################
         self.neigh = KNeighborsClassifier(n_neighbors=n_neighbors)
-        self.cols = ['age', 'admissionweight', 'GCS Total', 'Heart Rate', 'O2 Saturation', 'Respiratory Rate', 'BP Mean']
+        self.cols = ['age', 'unitvisitnumber', 'admissionweight', 'GCS Total', 'Heart Rate', 'O2 Saturation', 'Respiratory Rate', 'BP Mean']
 
     def fit(self, x_train, y_train, x_val=None, y_val=None):
         ############################ Your Code Here ############################
@@ -20,7 +20,7 @@ class Model():
         ########################################################################
         x_train = x_train[self.cols]
         x_val = x_val[self.cols]
-        self.pca = PCA(n_components=2)
+        self.pca = PCA(n_components=3)
         self.pca.fit(x_train)
         x_train = self.pca.transform(x_train)
         x_val = self.pca.transform(x_val)
