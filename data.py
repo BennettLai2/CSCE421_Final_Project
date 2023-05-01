@@ -55,6 +55,8 @@ def preprocess_x(df):
     # changing age to int dtype
     df['age'] = df['age'].replace(['> 89'], '89')
     df['age'] = df['age'].astype(int)
+    df['celllabel'] = df['celllabel'].fillna('Capillary Refill')
+    df['cellattributevalue'] = df['cellattributevalue'].fillna(-1)
 
     # df.to_csv('pre.csv')
     
@@ -87,6 +89,7 @@ def preprocess_x(df):
     # condensed_df['Capillary Refill'] = condensed_df['Capillary Refill'].ffill()
     # condensed_df['Capillary Refill'] = condensed_df['Capillary Refill'].fillna(0, inplace=True)
     
+    condensed_df['Capillary Refill'] = condensed_df['Capillary Refill'].replace(-1, pd.NaT)
     condensed_df['Capillary Refill'] = condensed_df.groupby('patientunitstayid')['Capillary Refill'].ffill().fillna(0)
     condensed_df['Heart Rate'] = condensed_df.groupby('patientunitstayid')['Heart Rate'].ffill().bfill()
     condensed_df['Heart Rate'] = condensed_df['Heart Rate'].fillna(condensed_df['Heart Rate'])
@@ -115,11 +118,16 @@ def preprocess_x(df):
     condensed_df['BP Systolic'] = condensed_df.groupby('patientunitstayid')['BP Systolic'].ffill().bfill()
     condensed_df['BP Systolic'] = condensed_df['BP Systolic'].fillna(condensed_df['BP Systolic'])   
     condensed_df['BP Mean'] = condensed_df['BP Mean'].fillna(condensed_df['BP Diastolic'].shift(1) + (condensed_df['BP Systolic'].shift(-1) - condensed_df['BP Diastolic'].shift(1))/3)
-    condensed_df=condensed_df.ffill()
+    condensed_df=condensed_df.ffill().bfill()
     categorical = condensed_df.select_dtypes(exclude=['int64', 'float64'])
     numerical = condensed_df.select_dtypes(include=['int64', 'float64'])
     cate_dummies = pd.get_dummies(categorical)
     condensed_df = pd.concat([cate_dummies, numerical], axis=1)
-    condensed_df.to_csv('processed_train_x.csv', index=False)
+
+    
+
+    # for feature in condensed_df.columns:
+    #     condensed_df[feature] = abs(condensed_df[feature] - condensed_df[feature].mean())
+    # condensed_df.to_csv('processed_train_x.csv', index=False)
 
     return condensed_df

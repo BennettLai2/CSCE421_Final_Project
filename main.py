@@ -43,11 +43,11 @@ def main():
     # device = get_default_device()
     # print(device)
 
-    merged_df = load_data("processed_train_x.csv")
-    # x = load_data("train_x.csv")
-    # y = load_data("train_y.csv")
-    # merged_df = pd.merge(x, y[['patientunitstayid', 'hospitaldischargestatus']], on='patientunitstayid')
-    # merged_df = preprocess_x(merged_df)
+    # merged_df = load_data("processed_train_x.csv")
+    x = load_data("train_x.csv")
+    y = load_data("train_y.csv")
+    merged_df = pd.merge(x, y[['patientunitstayid', 'hospitaldischargestatus']], on='patientunitstayid')
+    merged_df = preprocess_x(merged_df)
     y = merged_df[['hospitaldischargestatus']].values.ravel()
     np.savetxt('y.csv', y, delimiter=',')
     x = merged_df.drop('hospitaldischargestatus', axis=1)
@@ -64,7 +64,7 @@ def main():
 
     # ############################
 
-    model = Model(100)  # you can add arguments as needed
+    model = Model(50)  # you can add arguments as needed
     acc = model.fit(train_x.drop('patientunitstayid', axis=1), train_y, test_x.drop('patientunitstayid', axis=1), test_y)
     print(acc)
 
@@ -79,21 +79,22 @@ def main():
     # # create 2D array with patientunitstayid and mean proba values
     result = np.column_stack((unique_ids, mean_proba))
     np.savetxt('result.csv', result, delimiter=',')
-    # x = load_data("test_x.csv")
+    
+    # ---------------------------------------------
+    # test_x = load_data("test_x.csv")
+    # test_x['hospitaldischargestatus'] = test_x['offset'].fillna(0)
+    # test_x = preprocess_x(test_x)
+    # probas = pd.DataFrame(model.predict_proba(test_x.drop('patientunitstayid', axis=1)), columns=['proba_0', 'proba_1'])
+    # probas = probas[['proba_0']].values.ravel()
+    # np.savetxt('probas.csv', probas, delimiter=',')
+    # # print(test_x)
+    # patientunitstayid = test_x[['patientunitstayid']].values.ravel()
+    # unique_ids = np.unique(patientunitstayid)
+    # mean_proba = [np.mean(probas[np.where(patientunitstayid==id)]) for id in unique_ids]
 
-    # ###### Your Code Here #######
-    # # Add anything you want here
-
-    # ############################
-
-    # processed_x_test = preprocess_x(x)
-
-    # prediction_probs = model.predict_proba(processed_x_test)
-
-    #### Your Code Here ####
-    # Save your results
-
-    ########################
+    # # # create 2D array with patientunitstayid and mean proba values
+    # result = np.column_stack((unique_ids, mean_proba))
+    # np.savetxt('result.csv', result, delimiter=',')
 
 
 if __name__ == "__main__":
