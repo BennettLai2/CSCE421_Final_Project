@@ -69,6 +69,9 @@ def preprocess_x(df):
         mean = df[col].apply(pd.to_numeric, errors='coerce').mean()
         df[col] = df.groupby('patientunitstayid')[col].fillna(mean)
 
+    df['celllabel'] = df['celllabel'].fillna('Capillary Refill')
+    df['cellattributevalue'] = df['cellattributevalue'].fillna(-1)
+
     condensed_df1 = df.pivot_table(
         index=['patientunitstayid', 'offset', 'admissionheight', 'admissionweight', 'age', 'ethnicity', 'gender', 'unitvisitnumber'],
         columns=['nursingchartcelltypevalname'],
@@ -93,6 +96,8 @@ def preprocess_x(df):
     
     df = condensed_df.sort_values(by=['patientunitstayid', 'offset'])
     df.columns = ["patientunitstayid","offset","admissionheight","admissionweight","age","ethnicity","gender","unitvisitnumber","Capillary Refill","GCS Total","Heart Rate","Invasive BP Diastolic","Invasive BP Mean","Invasive BP Systolic","Non-Invasive BP Diastolic","Non-Invasive BP Mean","Non-Invasive BP Systolic","O2 Saturation","Respiratory Rate","glucose","pH"]
+    
+    df['Capillary Refill'] = df['Capillary Refill'].replace(-1, pd.NaT)
     combined_df = df[['Invasive BP Diastolic', 'Invasive BP Mean', 'Invasive BP Systolic', 'Non-Invasive BP Diastolic', 'Non-Invasive BP Mean', 'Non-Invasive BP Systolic']].copy()
     combined_df['BP Diastolic'] = combined_df['Invasive BP Diastolic'].combine_first(combined_df['Non-Invasive BP Diastolic'])
     combined_df['BP Mean'] = combined_df['Invasive BP Mean'].combine_first(combined_df['Non-Invasive BP Mean'])
@@ -116,5 +121,4 @@ def preprocess_x(df):
         df[cols[i]] = df.groupby('patientunitstayid')[cols[i]].fillna(vals[i])
 
     df = df.ffill().bfill()
-    df.to_csv('data.csv', index=False)
     return df

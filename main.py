@@ -41,18 +41,37 @@ class DeviceDataLoader():
 
 def main():
 
-    x = load_data("train_x.csv")
-    x = preprocess_x(x)
     # x = load_data("train_x.csv")
-    # y = load_data("train_y.csv")
-    # merged_df = pd.merge(x, y[['patientunitstayid', 'hospitaldischargestatus']], on='patientunitstayid')
-    # merged_df = preprocess_x(merged_df)
-    # merged_df = merged_df.reindex(columns =['patientunitstayid', 'hospitaldischargestatus', 'ethnicity_African American', 'ethnicity_Asian', 'ethnicity_Caucasian', 'ethnicity_Hispanic', 'ethnicity_Native American', 'ethnicity_Other/Unknown', 'gender_Female', 'gender_Male', 'unitvisitnumber', 'offset', 'admissionheight', 'admissionweight', 'age', 'Capillary Refill', 'GCS Total', 'Heart Rate', 'O2 Saturation', 'Respiratory Rate', 'glucose', 'pH', 'BP Diastolic', 'BP Mean', 'BP Systolic'])
-    # merged_df.to_csv('processed_train_x.csv', index=False)
-    # y = merged_df[['hospitaldischargestatus']].values.ravel()
-    # # np.savetxt('y.csv', y, delimiter=',')
-    # x = merged_df.drop('hospitaldischargestatus', axis=1)
+    # x = preprocess_x(x)
+    # x.to_csv('processed_train_x.csv')
+    x = load_data("processed_train_x.csv")
+    y = load_data('train_y.csv')
+    
+    y = pd.DataFrame({'hospitaldischargestatus': x['patientunitstayid'].map(y.set_index('patientunitstayid')['hospitaldischargestatus'])})
+    
+    train_x, test_x, train_y, test_y = split_data(x, y)
 
+    # -------------------------
+    skf=StratifiedKFold(n_splits=5, shuffle=False)
+    for train_index, test_index in skf.split(x, y): 
+        X_train, X_test = x.iloc[train_index], x.iloc[test_index]
+        Y_train, Y_test = y.iloc[train_index], y.iloc[test_index]
+        # Y_train = y[train_index]
+        # Y_test = y[test_index]
+        
+        cv_model = Model(20)  # you can add arguments as needed
+        acc = cv_model.fit(X_train, Y_train, X_test, Y_test)
+        print(acc)
+    model = Model(20)  # you can add arguments as needed
+    acc = model.fit(train_x, train_y, test_x, test_y)
+    print(acc)
+
+    # test_x = load_data('test_x.csv')
+    # test_x = preprocess_x(test_x)
+    # test_x.to_csv('processed_test_x.csv')
+    test_x = load_data('processed_test_x.csv')
+    pred = model.predict_proba(test_x)
+    pred.to_csv('pred.csv', index=False)
 
 if __name__ == "__main__":
     main()
