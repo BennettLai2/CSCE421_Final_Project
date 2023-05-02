@@ -121,4 +121,15 @@ def preprocess_x(df):
         df[cols[i]] = df.groupby('patientunitstayid')[cols[i]].fillna(vals[i])
 
     df = df.ffill().bfill()
+
+    
+    df = df.apply(pd.to_numeric, errors='coerce')
+    df_mean = df.mean()
+    df_max = df.groupby('patientunitstayid', as_index=False).max()
+    df_min = df.groupby('patientunitstayid', as_index=False).min()
+    cols = ['Capillary Refill','GCS Total','Heart Rate','O2 Saturation','Respiratory Rate','glucose','pH','BP Diastolic','BP Mean','BP Systolic']
+    df_max[cols] = df_max[cols].subtract(df_mean[cols].values).abs()
+    df_min[cols] = df_min[cols].subtract(df_mean[cols].values).abs()
+    df = pd.DataFrame(np.maximum(df_max.values, df_min.values), columns=df_max.columns)
+
     return df

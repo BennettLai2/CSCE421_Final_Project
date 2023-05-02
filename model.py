@@ -1,4 +1,5 @@
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.decomposition import PCA
 from sklearn.svm import SVC
 import numpy as np
@@ -11,7 +12,7 @@ class Model():
         # You can add arguements to the initialization as needed
 
         ########################################################################
-        self.neigh = KNeighborsClassifier(n_neighbors=n_neighbors)
+        self.neigh = RandomForestClassifier(n_estimators=100, max_depth=10, random_state=0)
 
     def fit(self, x_train, y_train, x_val=None, y_val=None):
         ############################ Your Code Here ############################
@@ -20,7 +21,7 @@ class Model():
         ########################################################################
         x_train, y_train, x_val, y_val = x_train.drop('patientunitstayid', axis=1), y_train.values.ravel(), x_val.drop('patientunitstayid', axis=1), y_val.values.ravel()
         self.cols = x_train.columns
-        self.cols = ['age', 'unitvisitnumber', 'offset', 'GCS Total', 'Heart Rate', 'O2 Saturation', 'Respiratory Rate', 'BP Mean']
+        # self.cols = ['age', 'unitvisitnumber', 'offset', 'GCS Total', 'Heart Rate', 'O2 Saturation', 'Respiratory Rate', 'BP Mean']
         x_train = x_train[self.cols]
         x_val = x_val[self.cols]
         # self.pca = PCA(n_components=5)
@@ -45,4 +46,6 @@ class Model():
         mean_proba = np.array([np.mean(probas[np.where(patientunitstayid==id)]) for id in unique_ids])
 
         df = pd.DataFrame({'patientunitstayid': unique_ids, 'hospitaldischargestatus': mean_proba})
+        df['patientunitstayid'] = df['patientunitstayid'].astype(int)
+        df['hospitaldischargestatus'] = df['hospitaldischargestatus'].astype(float)
         return df

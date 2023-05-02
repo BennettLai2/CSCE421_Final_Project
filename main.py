@@ -59,7 +59,7 @@ def main():
         # Y_train = y[train_index]
         # Y_test = y[test_index]
         
-        cv_model = Model(20)  # you can add arguments as needed
+        cv_model = Model(5)  # you can add arguments as needed
         acc = cv_model.fit(X_train, Y_train, X_test, Y_test)
         print(acc)
     model = Model(20)  # you can add arguments as needed
