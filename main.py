@@ -52,18 +52,24 @@ def main():
     train_x, test_x, train_y, test_y = split_data(x, y)
 
     # -------------------------
-    skf=StratifiedKFold(n_splits=5, shuffle=False)
+    print("SKF:")
+    mean_score = 0
+    skf=StratifiedKFold(n_splits=5, shuffle=True)
     for train_index, test_index in skf.split(x, y): 
         X_train, X_test = x.iloc[train_index], x.iloc[test_index]
         Y_train, Y_test = y.iloc[train_index], y.iloc[test_index]
         # Y_train = y[train_index]
         # Y_test = y[test_index]
         
-        cv_model = Model(5)  # you can add arguments as needed
+        cv_model = Model()  # you can add arguments as needed
         acc = cv_model.fit(X_train, Y_train, X_test, Y_test)
         print(acc)
-    model = Model(20)  # you can add arguments as needed
+        mean_score += acc
+    print("Average ROC: ", mean_score / 5)
+    model = Model()  # you can add arguments as needed
     acc = model.fit(train_x, train_y, test_x, test_y)
+    print()
+    print("Full Dataset:")
     print(acc)
 
     # test_x = load_data('test_x.csv')

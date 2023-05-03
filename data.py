@@ -7,7 +7,6 @@ from torch.nn.utils.rnn import pad_sequence
 
 
 def load_data(x_path):
-    # Your code here
     return pd.read_csv(x_path, 
                        dtype={'admissionheight': float, 
                               'admissionweight': float, 
@@ -27,17 +26,16 @@ def load_data(x_path):
 
 
 def split_data(x, y, split=0.8):
-    # Your code here
     train_x, test_x, train_y, test_y = train_test_split(x, y, test_size = 1-split, shuffle=False)
     return train_x, test_x, train_y, test_y
 
 
 def preprocess_x(df):
-    # Your code here
-    # sort data by the following
+    # Sort data by the following
     df = df.sort_values(by=['patientunitstayid', 'age', 'offset', 'nursingchartcelltypevalname'])
     df['age'] = df['age'].replace(['> 89'], '89')
 
+    # Convert categorical data to numerical
     df['cellattributevalue'] = df['cellattributevalue'].replace({'normal': 0, 
                                                                 '< 2 seconds': 1, 
                                                                 '> 2 seconds': 2, 
@@ -51,6 +49,7 @@ def preprocess_x(df):
                                                 'Other/Unknown': 5})
     df['gender'] = df['gender'].replace({'Female': 0, 'Male': 1})
 
+    # Drop entries where no lab name and no lab result
     mask = (~df['labname'].isnull()) & (df['labresult'].isnull())
     df.drop(index=df.loc[mask].index, inplace=True)
 
@@ -72,12 +71,13 @@ def preprocess_x(df):
     df['celllabel'] = df['celllabel'].fillna('Capillary Refill')
     df['cellattributevalue'] = df['cellattributevalue'].fillna(-1)
 
+    # Pivot dataset so that each possible "nursingchartcelltypevalname" result gets its own column
     condensed_df1 = df.pivot_table(
         index=['patientunitstayid', 'offset', 'admissionheight', 'admissionweight', 'age', 'ethnicity', 'gender', 'unitvisitnumber'],
         columns=['nursingchartcelltypevalname'],
         values=['nursingchartvalue']
     ).reset_index()
-    
+
     condensed_df2 = df.pivot_table(
         index=['patientunitstayid', 'offset', 'admissionheight', 'admissionweight', 'age', 'ethnicity', 'gender', 'unitvisitnumber'],
         columns=['labname'],

@@ -2,17 +2,18 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.decomposition import PCA
 from sklearn.svm import SVC
+from sklearn.metrics import roc_auc_score
 import numpy as np
 import pandas as pd
 
 class Model():
-    def __init__(self, n_neighbors: int):
+    def __init__(self):
         ############################ Your Code Here ############################
         # Initialize your model in this space
         # You can add arguements to the initialization as needed
 
         ########################################################################
-        self.neigh = RandomForestClassifier(n_estimators=100, max_depth=10, random_state=0)
+        self.forest = RandomForestClassifier(n_estimators=100, max_depth=10, random_state=0)
 
     def fit(self, x_train, y_train, x_val=None, y_val=None):
         ############################ Your Code Here ############################
@@ -28,8 +29,10 @@ class Model():
         # self.pca.fit(x_train)
         # x_train = self.pca.transform(x_train)
         # x_val = self.pca.transform(x_val)
-        self.neigh.fit(x_train, y_train)
-        return self.neigh.score(x_val, y_val)
+        self.forest.fit(x_train, y_train)
+        print("Accuracy: ",self.forest.score(x_val, y_val))
+        return roc_auc_score(y_val, self.forest.predict_proba(x_val)[:,1])
+        
 
     def predict_proba(self, x):
         ############################ Your Code Here ############################
@@ -40,7 +43,7 @@ class Model():
         x.drop('patientunitstayid', axis = 1)
         x =x[self.cols]
         # x = self.pca.transform(x)
-        probas = self.neigh.predict_proba(x)
+        probas = self.forest.predict_proba(x)
         probas = probas[:, 1]
         unique_ids = np.unique(patientunitstayid)
         mean_proba = np.array([np.mean(probas[np.where(patientunitstayid==id)]) for id in unique_ids])
