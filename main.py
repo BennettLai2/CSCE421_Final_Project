@@ -52,7 +52,7 @@ def main():
     train_x, test_x, train_y, test_y = split_data(x, y)
 
     # -------------------------
-    print("SKF:")
+    # print("SKF:")
     mean_score = 0
     skf=StratifiedKFold(n_splits=5, shuffle=True)
     for train_index, test_index in skf.split(x, y): 

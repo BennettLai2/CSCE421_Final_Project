@@ -13,7 +13,7 @@ class Model():
         # You can add arguements to the initialization as needed
 
         ########################################################################
-        self.forest = RandomForestClassifier(n_estimators=100, max_depth=10, random_state=0)
+        self.forest = RandomForestClassifier(n_estimators=500, max_depth=15, min_samples_split=5, min_samples_leaf=2, class_weight="balanced", random_state=0)
 
     def fit(self, x_train, y_train, x_val=None, y_val=None):
         ############################ Your Code Here ############################
