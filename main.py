@@ -17,9 +17,10 @@ from model import Model
 
 def main():
 
-    x = load_data("train_x.csv")
-    x = preprocess_x(x)
-    x.to_csv('processed_train_x.csv')
+    # x = load_data("train_x.csv")
+    # x = preprocess_x(x)
+    # x.to_csv('processed_train_x.csv')
+    x=load_data('processed_train_x.csv')
     y = load_data('train_y.csv')
     
     y = pd.DataFrame({'hospitaldischargestatus': x['patientunitstayid'].map(y.set_index('patientunitstayid')['hospitaldischargestatus'])})
@@ -45,9 +46,10 @@ def main():
     # print("Full Dataset:")
     # print(acc)
 
-    test_x = load_data('test_x.csv')
-    test_x = preprocess_x(test_x)
-    test_x.to_csv('processed_test_x.csv')
+    # test_x = load_data('test_x.csv')
+    # test_x = preprocess_x(test_x)
+    # test_x.to_csv('processed_test_x.csv')
+    test_x=load_data('processed_test_x.csv')
     pred = model.predict_proba(test_x)
     pred.to_csv('pred.csv', index=False)
 

@@ -1,7 +1,9 @@
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import roc_auc_score
+import sklearn.metrics as metrics
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 
 class Model():
     def __init__(self):
@@ -20,7 +22,15 @@ class Model():
         x_train, y_train, x_val, y_val = x_train.drop('patientunitstayid', axis=1), y_train.values.ravel(), x_val.drop('patientunitstayid', axis=1), y_val.values.ravel()
         
         self.forest.fit(x_train, y_train)
-        print("Accuracy: ",self.forest.score(x_val, y_val))
+
+        y_pred_proba = self.forest.predict_proba(x_val)[::,1]
+        fpr, tpr, _ = metrics.roc_curve(y_val,  y_pred_proba)
+
+        #create ROC curve
+        plt.plot(fpr,tpr)
+        plt.ylabel('True Positive Rate')
+        plt.xlabel('False Positive Rate')
+        plt.show()
         return roc_auc_score(y_val, self.forest.predict_proba(x_val)[:,1])
         
 
