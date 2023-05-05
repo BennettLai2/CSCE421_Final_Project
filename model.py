@@ -30,7 +30,7 @@ class Model():
 
         ########################################################################
         patientunitstayid = x['patientunitstayid'].values.ravel()
-        x.drop('patientunitstayid', axis = 1)
+        x = x.drop('patientunitstayid', axis = 1)
        
         probas = self.forest.predict_proba(x)
         probas = probas[:, 1]

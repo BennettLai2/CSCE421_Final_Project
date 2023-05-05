@@ -32,7 +32,7 @@ def split_data(x, y, split=0.8):
 
 def preprocess_x(df):
     # Sort data by the following
-    df = df.sort_values(by=['patientunitstayid', 'age', 'offset', 'nursingchartcelltypevalname'])
+    df = df.sort_values(by=['patientunitstayid', 'unitvisitnumber', 'offset'])
     df['age'] = df['age'].replace(['> 89'], '89')
 
     # Convert categorical data to numerical
